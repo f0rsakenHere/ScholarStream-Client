@@ -47,24 +47,20 @@ const Register = () => {
         createdAt: new Date(),
       };
 
-      const res = await axiosPublic.post("/users", userInfo);
+      const res = await axiosPublic.post("/api/users", userInfo);
       console.log("Database response:", res.data);
 
       // Handle both new user (insertedId) and existing user cases
       if (res.data.insertedId || res.data.message || res.status === 200) {
         console.log("User saved to database");
         reset();
-        toast.success("Registration successful! Redirecting to login...");
-        setTimeout(() => {
-          navigate("/login");
-        }, 1500);
+        toast.success("Registration successful! Welcome to ScholarStream!");
+        navigate("/dashboard");
       } else {
         // Still continue if Firebase user was created
         reset();
-        toast.success("Account created! Redirecting to login...");
-        setTimeout(() => {
-          navigate("/login");
-        }, 1500);
+        toast.success("Account created! Welcome to ScholarStream!");
+        navigate("/dashboard");
       }
     } catch (error) {
       console.error("Registration error:", error);

@@ -19,6 +19,16 @@ const DashboardLayout = () => {
   const { isAdmin, isModerator, isStudent, userRole, isRoleLoading } =
     useUserRole();
 
+  // CRITICAL FIX: Show a loader while checking the role
+  // If we don't do this, it defaults to "Student" instantly
+  if (isRoleLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        <span className="loading loading-spinner loading-lg text-primary"></span>
+      </div>
+    );
+  }
+
   const handleLogout = async () => {
     try {
       await logOut();

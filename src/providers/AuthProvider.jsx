@@ -59,10 +59,10 @@ const AuthProvider = ({ children }) => {
       setUser(currentUser);
 
       if (currentUser) {
-        // 1. Get Token from Server (Updated to match backend: /auth/jwt)
+        // 1. Get Token from Server (endpoint is /jwt)
         const userInfo = { email: currentUser.email };
         axiosPublic
-          .post("/auth/jwt", userInfo)
+          .post("/jwt", userInfo)
           .then((res) => {
             if (res.data.token) {
               localStorage.setItem("access-token", res.data.token);
