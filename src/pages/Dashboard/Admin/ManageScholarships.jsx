@@ -268,7 +268,7 @@ const ManageScholarships = () => {
               </div>
             </div>
             <div className="stat bg-base-200 rounded-lg">
-              <div className="stat-title">Upcoming Deadlines</div>
+              <div className="stat-title">Upcoming Deadlines (30 days)</div>
               <div className="stat-value text-warning">
                 {
                   scholarships.filter(
@@ -285,7 +285,7 @@ const ManageScholarships = () => {
           {/* Edit Modal */}
           {editingScholarship && (
             <div
-              className="fixed inset-0 bg-black bg-opacity-30 flex items-center justify-center z-50 p-4"
+              className="fixed inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center z-50 p-4"
               onClick={handleCloseModal}
             >
               <div
