@@ -17,12 +17,13 @@ const useUserRole = () => {
     retry: 1,
     queryFn: async () => {
       try {
-        const res = await axiosSecure.get(`/users?email=${user.email}`);
-        // Find the user in the response
-        const userData = Array.isArray(res.data)
-          ? res.data.find((u) => u.email === user.email)
-          : res.data;
-        return userData?.role || "student";
+        // Fetch all users and find the one with matching email
+        const res = await axiosSecure.get(`/users`);
+        const users = res.data;
+        const currentUser = users.find((u) => u.email === user.email);
+        console.log("useUserRole - found user:", currentUser);
+        console.log("useUserRole - role:", currentUser?.role);
+        return currentUser?.role || "student";
       } catch (error) {
         console.error("Error fetching user role:", error);
         return "student"; // Default to student on error

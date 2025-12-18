@@ -10,12 +10,12 @@ const useModerator = () => {
     queryKey: [user?.email, "isModerator"],
     enabled: !loading && !!user?.email,
     queryFn: async () => {
-      const res = await axiosSecure.get(`/users?email=${user.email}`);
-      // Find the user in the response
-      const userData = Array.isArray(res.data)
-        ? res.data.find((u) => u.email === user.email)
-        : res.data;
-      return userData?.role === "moderator";
+      // Fetch all users and find the one with matching email
+      const res = await axiosSecure.get(`/users`);
+      const users = res.data;
+      const currentUser = users.find((u) => u.email === user.email);
+      console.log("Moderator check - found user:", currentUser);
+      return currentUser?.role === "moderator";
     },
   });
 
