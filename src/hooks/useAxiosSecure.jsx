@@ -4,7 +4,7 @@ import { useNavigate } from "react-router-dom";
 import { useAuth } from "./useAuth";
 
 const axiosSecure = axios.create({
-  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000",
+  baseURL: import.meta.env.VITE_API_URL || "http://localhost:5000/api",
   withCredentials: true,
 });
 
@@ -36,8 +36,9 @@ const useAxiosSecure = () => {
       async (error) => {
         const status = error.response?.status;
 
-        // Handle 401 and 403 errors
-        if (status === 401 || status === 403) {
+        // Only logout on 401 (unauthorized/expired token)
+        // Don't logout on 403 (forbidden/permission issue)
+        if (status === 401) {
           await logOut();
           navigate("/login");
         }

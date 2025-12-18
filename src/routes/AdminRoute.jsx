@@ -1,23 +1,13 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import useAxiosSecure from "../hooks/useAxiosSecure";
-import { useQuery } from "@tanstack/react-query";
+import useAdmin from "../hooks/useAdmin";
 
 const AdminRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  const axiosSecure = useAxiosSecure();
+  const [isAdmin, isAdminLoading] = useAdmin();
   const location = useLocation();
 
-  const { data: userData, isLoading: isUserLoading } = useQuery({
-    queryKey: ["user", user?.email],
-    enabled: !!user?.email,
-    queryFn: async () => {
-      const res = await axiosSecure.get(`/users/${user.email}`);
-      return res.data;
-    },
-  });
-
-  if (loading || isUserLoading) {
+  if (loading || isAdminLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <span className="loading loading-spinner loading-lg"></span>
@@ -25,7 +15,7 @@ const AdminRoute = ({ children }) => {
     );
   }
 
-  if (user && userData?.role === "admin") {
+  if (user && isAdmin) {
     return children;
   }
 

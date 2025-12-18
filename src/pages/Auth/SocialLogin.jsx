@@ -25,7 +25,7 @@ const SocialLogin = ({ isLoading = false }) => {
 
         try {
           // This will create user if not exists, or backend handles duplicates
-          await axiosPublic.post("/api/users", userInfo);
+          await axiosPublic.post("/users", userInfo);
         } catch (dbError) {
           // If DB error (like duplicate), still continue - user might already exist
           console.log(

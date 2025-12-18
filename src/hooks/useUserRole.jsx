@@ -27,7 +27,7 @@ const useUserRole = () => {
         }
 
         // Fetch all users and find the one with matching email
-        const res = await axiosSecure.get(`/api/users`);
+        const res = await axiosSecure.get(`/users`);
         console.log("useUserRole - API response:", res.data);
         const users = res.data.users; // Response format: { total, users: [...] }
         const currentUser = users.find((u) => u.email === user.email);

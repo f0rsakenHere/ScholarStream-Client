@@ -11,7 +11,7 @@ const useModerator = () => {
     enabled: !loading && !!user?.email,
     queryFn: async () => {
       // Fetch all users and find the one with matching email
-      const res = await axiosSecure.get(`/api/users`);
+      const res = await axiosSecure.get(`/users`);
       const users = res.data.users; // Response format: { total, users: [...] }
       const currentUser = users.find((u) => u.email === user.email);
       console.log("Moderator check - found user:", currentUser);

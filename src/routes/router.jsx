@@ -10,6 +10,7 @@ import ModeratorRoute from "./ModeratorRoute";
 import Home from "../pages/Home/Home";
 import Login from "../pages/Auth/Login";
 import Register from "../pages/Auth/Register";
+import ForgotPassword from "../pages/Auth/ForgotPassword";
 import AllScholarships from "../pages/AllScholarships";
 import ScholarshipDetails from "../pages/ScholarshipDetails";
 import Payment from "../pages/Payment/Payment";
@@ -61,6 +62,7 @@ const router = createBrowserRouter([
       },
       { path: "login", element: <Login /> },
       { path: "register", element: <Register /> },
+      { path: "forgot-password", element: <ForgotPassword /> },
       {
         path: "payment-success/:tranId",
         element: (

@@ -47,7 +47,7 @@ const Register = () => {
         createdAt: new Date(),
       };
 
-      const res = await axiosPublic.post("/api/users", userInfo);
+      const res = await axiosPublic.post("/users", userInfo);
       console.log("Database response:", res.data);
 
       // Handle both new user (insertedId) and existing user cases

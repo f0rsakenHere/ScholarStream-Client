@@ -1,23 +1,13 @@
 import { Navigate, useLocation } from "react-router-dom";
 import { useAuth } from "../hooks/useAuth";
-import useAxiosSecure from "../hooks/useAxiosSecure";
-import { useQuery } from "@tanstack/react-query";
+import useUserRole from "../hooks/useUserRole";
 
 const ModeratorRoute = ({ children }) => {
   const { user, loading } = useAuth();
-  const axiosSecure = useAxiosSecure();
+  const { isAdmin, isModerator, isRoleLoading } = useUserRole();
   const location = useLocation();
 
-  const { data: userData, isLoading: isUserLoading } = useQuery({
-    queryKey: ["user", user?.email],
-    enabled: !!user?.email,
-    queryFn: async () => {
-      const res = await axiosSecure.get(`/users/${user.email}`);
-      return res.data;
-    },
-  });
-
-  if (loading || isUserLoading) {
+  if (loading || isRoleLoading) {
     return (
       <div className="min-h-screen flex items-center justify-center">
         <span className="loading loading-spinner loading-lg"></span>
@@ -25,7 +15,8 @@ const ModeratorRoute = ({ children }) => {
     );
   }
 
-  if (user && (userData?.role === "moderator" || userData?.role === "admin")) {
+  // Moderators and Admins can access moderator routes
+  if (user && (isModerator || isAdmin)) {
     return children;
   }
 
