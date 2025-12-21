@@ -23,7 +23,10 @@ const CheckoutForm = ({ scholarship }) => {
       const applicationData = {
         scholarshipId: scholarship._id,
         universityName: scholarship.universityName,
-        universityAddress: scholarship.location || scholarship.universityAddress || "Not specified",
+        universityAddress:
+          scholarship.location ||
+          scholarship.universityAddress ||
+          "Not specified",
         scholarshipCategory: scholarship.scholarshipCategory,
         degree: scholarship.degree,
         applicationFees: Number(scholarship.applicationFees) || 0,
