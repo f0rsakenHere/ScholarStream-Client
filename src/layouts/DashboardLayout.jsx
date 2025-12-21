@@ -40,8 +40,8 @@ const DashboardLayout = () => {
   const navLinkClasses = ({ isActive }) =>
     `flex items-center gap-3 px-4 py-3 rounded-lg transition-all duration-200 ${
       isActive
-        ? "bg-primary text-primary-content shadow-md font-semibold"
-        : "text-base-content hover:bg-base-300 hover:pl-5"
+        ? "bg-gradient-to-r from-purple-700 to-purple-600 text-white shadow-lg font-semibold"
+        : "text-base-content/70 hover:bg-base-100 hover:text-base-content"
     }`;
 
   // Get role label for dashboard header
@@ -54,115 +54,121 @@ const DashboardLayout = () => {
   return (
     <div className="min-h-screen flex bg-base-100 font-sans">
       {/* Sidebar */}
-      <aside className="w-72 bg-base-200 shadow-xl flex flex-col z-10">
-        <div className="p-6 border-b border-base-300">
-          <h2 className="text-2xl font-bold text-primary flex items-center gap-2">
-            <span>🎓</span> ScholarStream
-          </h2>
-          <p className="text-xs text-base-content/60 mt-1 pl-1">
-            {getRoleLabel()}
-          </p>
+      <aside className="w-72 bg-white border-r border-base-200/30 shadow-sm flex flex-col z-10">
+        <div className="px-6 py-5 border-b border-base-200/20">
+          <div className="flex items-center gap-3">
+            <div className="w-11 h-11 rounded-full flex items-center justify-center bg-gradient-to-b from-purple-200 to-purple-400 text-white font-bold">
+              🎓
+            </div>
+            <div>
+              <h3 className="text-lg font-bold text-purple-700">
+                ScholarStream
+              </h3>
+              <div className="text-xs text-base-content/60">
+                {getRoleLabel()}
+              </div>
+            </div>
+          </div>
         </div>
 
-        <nav className="flex-1 overflow-y-auto p-4 space-y-2">
-          {/* Student Routes - Show for students or when role is loading */}
-          {isStudent && (
-            <>
-              <div className="divider text-xs font-bold text-base-content/40 my-2">
-                STUDENT MENU
-              </div>
-
-              <NavLink to="/dashboard/user-profile" className={navLinkClasses}>
-                <FaUser /> My Profile
-              </NavLink>
-
-              <NavLink
-                to="/dashboard/my-applications"
-                className={navLinkClasses}
-              >
-                <FaFileAlt /> My Applications
-              </NavLink>
-
-              <NavLink to="/dashboard/my-reviews" className={navLinkClasses}>
-                <FaStar /> My Reviews
-              </NavLink>
-            </>
-          )}
-
-          {/* Moderator Routes */}
-          {isModerator && (
-            <>
-              <div className="divider text-xs font-bold text-base-content/40 my-2">
-                MODERATOR MENU
-              </div>
-
-              <NavLink
-                to="/dashboard/moderator-profile"
-                className={navLinkClasses}
-              >
-                <FaUser /> Moderator Profile
-              </NavLink>
-
-              <NavLink
-                to="/dashboard/manage-scholarships"
-                className={navLinkClasses}
-              >
-                <FaList /> Manage Scholarships
-              </NavLink>
-
-              <NavLink
-                to="/dashboard/manage-applications"
-                className={navLinkClasses}
-              >
-                <FaClipboardList /> Manage Applications
-              </NavLink>
-
-              <NavLink to="/dashboard/all-reviews" className={navLinkClasses}>
-                <FaStar /> All Reviews
-              </NavLink>
-            </>
-          )}
-
-          {/* Admin Routes */}
+        <nav className="flex-1 overflow-y-auto px-4 py-6 space-y-4">
           {isAdmin && (
-            <>
-              <div className="divider text-xs font-bold text-base-content/40 my-2">
+            <div>
+              <div className="text-xs font-semibold text-base-content/40 mb-2">
                 ADMIN MENU
               </div>
-
-              <NavLink to="/dashboard/admin-profile" className={navLinkClasses}>
-                <FaUser /> Admin Profile
-              </NavLink>
-
-              <NavLink
-                to="/dashboard/add-scholarship"
-                className={navLinkClasses}
-              >
-                <FaPlusCircle /> Add Scholarship
-              </NavLink>
-
-              <NavLink
-                to="/dashboard/manage-scholarships"
-                className={navLinkClasses}
-              >
-                <FaList /> Manage Scholarships
-              </NavLink>
-
-              <NavLink to="/dashboard/manage-users" className={navLinkClasses}>
-                <FaUsers /> Manage Users
-              </NavLink>
-
-              <NavLink
-                to="/dashboard/admin-analytics"
-                className={navLinkClasses}
-              >
-                <FaChartLine /> Analytics
-              </NavLink>
-            </>
+              <div className="flex flex-col gap-2">
+                <NavLink
+                  to="/dashboard/admin-profile"
+                  className={navLinkClasses}
+                >
+                  <FaUser /> Admin Profile
+                </NavLink>
+                <NavLink
+                  to="/dashboard/add-scholarship"
+                  className={navLinkClasses}
+                >
+                  <FaPlusCircle /> Add Scholarship
+                </NavLink>
+                <NavLink
+                  to="/dashboard/manage-scholarships"
+                  className={navLinkClasses}
+                >
+                  <FaList /> Manage Scholarships
+                </NavLink>
+                <NavLink
+                  to="/dashboard/manage-users"
+                  className={navLinkClasses}
+                >
+                  <FaUsers /> Manage Users
+                </NavLink>
+                <NavLink
+                  to="/dashboard/admin-analytics"
+                  className={navLinkClasses}
+                >
+                  <FaChartLine /> Analytics
+                </NavLink>
+              </div>
+            </div>
           )}
 
-          {/* Shared/Common Links */}
-          <div className="divider text-xs font-bold text-base-content/40 my-2">
+          {isModerator && (
+            <div>
+              <div className="text-xs font-semibold text-base-content/40 mb-2">
+                MODERATOR MENU
+              </div>
+              <div className="flex flex-col gap-2">
+                <NavLink
+                  to="/dashboard/moderator-profile"
+                  className={navLinkClasses}
+                >
+                  <FaUser /> Moderator Profile
+                </NavLink>
+                <NavLink
+                  to="/dashboard/manage-scholarships"
+                  className={navLinkClasses}
+                >
+                  <FaList /> Manage Scholarships
+                </NavLink>
+                <NavLink
+                  to="/dashboard/manage-applications"
+                  className={navLinkClasses}
+                >
+                  <FaClipboardList /> Manage Applications
+                </NavLink>
+                <NavLink to="/dashboard/all-reviews" className={navLinkClasses}>
+                  <FaStar /> All Reviews
+                </NavLink>
+              </div>
+            </div>
+          )}
+
+          {isStudent && (
+            <div>
+              <div className="text-xs font-semibold text-base-content/40 mb-2">
+                STUDENT MENU
+              </div>
+              <div className="flex flex-col gap-2">
+                <NavLink
+                  to="/dashboard/user-profile"
+                  className={navLinkClasses}
+                >
+                  <FaUser /> My Profile
+                </NavLink>
+                <NavLink
+                  to="/dashboard/my-applications"
+                  className={navLinkClasses}
+                >
+                  <FaFileAlt /> My Applications
+                </NavLink>
+                <NavLink to="/dashboard/my-reviews" className={navLinkClasses}>
+                  <FaStar /> My Reviews
+                </NavLink>
+              </div>
+            </div>
+          )}
+
+          <div className="text-xs font-semibold text-base-content/40 mt-4 mb-2">
             MAIN MENU
           </div>
           <NavLink to="/" className={navLinkClasses}>
@@ -170,51 +176,46 @@ const DashboardLayout = () => {
           </NavLink>
         </nav>
 
-        {/* User Footer */}
-        <div className="p-4 bg-base-300/50 border-t border-base-300">
-          <div className="flex items-center gap-3 mb-4">
-            <div className="avatar online">
-              <div className="w-10 h-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 overflow-hidden">
-                <img
-                  src={(() => {
-                    const p = user?.photoURL;
-                    const name = user?.displayName || user?.email || "User";
-                    const initialsSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      name
-                    )}&background=6b21a8&color=fff&rounded=true&size=64`;
-
-                    if (!p) return initialsSrc;
-                    if (/^https?:\/\//.test(p) || /^data:image\//.test(p))
-                      return p;
-                    if (/^\/\//.test(p)) return `https:${p}`;
-                    return initialsSrc;
-                  })()}
-                  alt={user?.displayName || user?.email || "User"}
-                  onError={(e) => {
-                    e.currentTarget.onerror = null;
-                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
-                      user?.displayName || user?.email || "User"
-                    )}&background=6b21a8&color=fff&rounded=true&size=64`;
-                  }}
-                  className="w-full h-full object-cover"
-                />
+        {/* Expanded nav (visible on md and above) */}
+        <div className="p-4 border-t border-base-200/20">
+          <div className="flex items-center gap-3 mb-3">
+            <div className="w-12 h-12 rounded-full overflow-hidden ring ring-primary ring-offset-base-100 ring-offset-2">
+              <img
+                src={(() => {
+                  const p = user?.photoURL;
+                  const name = user?.displayName || user?.email || "User";
+                  const initialsSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                    name
+                  )}&background=6b21a8&color=fff&rounded=true&size=64`;
+                  if (!p) return initialsSrc;
+                  if (/^https?:\/\//.test(p) || /^data:image\//.test(p))
+                    return p;
+                  if (/^\/\//.test(p)) return `https:${p}`;
+                  return initialsSrc;
+                })()}
+                alt={user?.displayName || user?.email || "User"}
+                onError={(e) => {
+                  e.currentTarget.onerror = null;
+                  e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                    user?.displayName || user?.email || "User"
+                  )}&background=6b21a8&color=fff&rounded=true&size=64`;
+                }}
+              />
+            </div>
+            <div>
+              <p className="text-sm font-bold">{user?.displayName || "User"}</p>
+              <p className="text-xs text-base-content/60">{user?.email}</p>
+              <div className="mt-2">
+                <span className="badge badge-sm bg-purple-600 text-white capitalize">
+                  {userRole}
+                </span>
               </div>
             </div>
-            <div className="flex-1 min-w-0">
-              <p className="text-sm font-bold truncate">
-                {user?.displayName || "User"}
-              </p>
-              <p className="text-xs text-base-content/60 truncate">
-                {user?.email}
-              </p>
-              <span className="badge badge-sm badge-primary mt-1 capitalize">
-                {userRole}
-              </span>
-            </div>
           </div>
+
           <button
             onClick={handleLogout}
-            className="btn btn-error btn-outline btn-sm w-full flex items-center gap-2"
+            className="btn btn-outline btn-error btn-sm w-full rounded-lg"
           >
             Logout
           </button>
