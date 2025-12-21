@@ -25,12 +25,23 @@ const SocialLogin = ({ isLoading = false }) => {
 
         try {
           // This will create user if not exists, or backend handles duplicates
-          await axiosPublic.post("/users", userInfo);
+          const res = await axiosPublic.post("/users", userInfo);
+          console.log("DB save response:", res.data);
+
+          // Show toast for new insert or success
+          if (res.data?.insertedId || res.status === 200) {
+            toast.success("User saved to database");
+          }
         } catch (dbError) {
           // If DB error (like duplicate), still continue - user might already exist
           console.log(
-            "DB save info:",
+            "DB save error:",
             dbError.response?.data || dbError.message
+          );
+
+          // Surface a non-blocking toast so it's easier to debug
+          toast.error(
+            dbError.response?.data?.message || "Failed to save user to database"
           );
         }
 

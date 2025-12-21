@@ -63,7 +63,22 @@ const Login = () => {
         };
 
         // POST /users will create if not exists, or your backend should handle duplicates
-        await axiosPublic.post("/users", userInfo);
+        try {
+          const res = await axiosPublic.post("/users", userInfo);
+          console.log("DB save response:", res.data);
+          if (res.data?.insertedId || res.status === 200) {
+            toast.success("User saved to database");
+          }
+        } catch (dbError) {
+          console.log(
+            "DB save error:",
+            dbError.response?.data || dbError.message
+          );
+          // Non-blocking toast to aid debugging
+          toast.error(
+            dbError.response?.data?.message || "Failed to save user to database"
+          );
+        }
 
         toast.success("Login with Google successful!");
         navigate(from, { replace: true });

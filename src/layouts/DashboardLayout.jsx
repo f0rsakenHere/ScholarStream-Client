@@ -174,10 +174,29 @@ const DashboardLayout = () => {
         <div className="p-4 bg-base-300/50 border-t border-base-300">
           <div className="flex items-center gap-3 mb-4">
             <div className="avatar online">
-              <div className="w-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2">
+              <div className="w-10 h-10 rounded-full ring ring-primary ring-offset-base-100 ring-offset-2 overflow-hidden">
                 <img
-                  src={user?.photoURL || "https://via.placeholder.com/40"}
-                  alt="User"
+                  src={(() => {
+                    const p = user?.photoURL;
+                    const name = user?.displayName || user?.email || "User";
+                    const initialsSrc = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      name
+                    )}&background=6b21a8&color=fff&rounded=true&size=64`;
+
+                    if (!p) return initialsSrc;
+                    if (/^https?:\/\//.test(p) || /^data:image\//.test(p))
+                      return p;
+                    if (/^\/\//.test(p)) return `https:${p}`;
+                    return initialsSrc;
+                  })()}
+                  alt={user?.displayName || user?.email || "User"}
+                  onError={(e) => {
+                    e.currentTarget.onerror = null;
+                    e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                      user?.displayName || user?.email || "User"
+                    )}&background=6b21a8&color=fff&rounded=true&size=64`;
+                  }}
+                  className="w-full h-full object-cover"
                 />
               </div>
             </div>

@@ -59,7 +59,27 @@ const AuthProvider = ({ children }) => {
       setUser(currentUser);
 
       if (currentUser) {
-        // 1. Get Token from Server (endpoint is /jwt)
+        // 1. Persist the user to the database (useful for social signins)
+        const dbUser = {
+          name: currentUser.displayName || currentUser?.name || "",
+          email: currentUser.email,
+          photoURL: currentUser.photoURL || "",
+          role: "student",
+        };
+
+        axiosPublic
+          .post("/users", dbUser)
+          .then((r) => {
+            console.log("Auth: ensured user exists in DB", r.data);
+          })
+          .catch((err) => {
+            console.warn(
+              "Auth: failed to ensure user in DB",
+              err.response?.data || err.message
+            );
+          });
+
+        // 2. Get Token from Server (endpoint is /jwt)
         const userInfo = { email: currentUser.email };
         axiosPublic
           .post("/jwt", userInfo)
@@ -74,7 +94,7 @@ const AuthProvider = ({ children }) => {
             setLoading(false);
           });
       } else {
-        // 2. Remove Token if logged out
+        // 3. Remove Token if logged out
         localStorage.removeItem("access-token");
         setLoading(false);
       }

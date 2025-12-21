@@ -19,7 +19,8 @@ import PaymentSuccess from "../pages/Payment/PaymentSuccess";
 import PaymentFail from "../pages/Payment/PaymentFail";
 import ErrorPage from "../pages/Shared/ErrorPage";
 
-// Dashboard - Admin
+// Dashboard - Index & Admin
+import DashboardIndex from "../pages/Dashboard/DashboardIndex";
 import AdminProfile from "../pages/Dashboard/Admin/AdminProfile";
 import AddScholarship from "../pages/Dashboard/Admin/AddScholarship";
 import ManageScholarships from "../pages/Dashboard/Admin/ManageScholarships";
@@ -90,6 +91,9 @@ const router = createBrowserRouter([
     ),
     errorElement: <ErrorPage />,
     children: [
+      // Default dashboard landing -> role-aware redirect
+      { index: true, element: <DashboardIndex /> },
+
       // Student routes (private)
       { path: "user-profile", element: <StudentProfile /> },
       { path: "my-applications", element: <MyApplications /> },
