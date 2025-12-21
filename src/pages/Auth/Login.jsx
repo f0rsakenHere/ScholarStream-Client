@@ -53,16 +53,12 @@ const Login = () => {
     try {
       const result = await signInWithGoogle();
       if (result.user) {
-        // Save/update user to MongoDB (handles both new and existing users)
-        // NOTE: Don't send 'role' here - backend sets default for new users
-        // and preserves existing role for returning users
         const userInfo = {
           name: result.user.displayName,
           email: result.user.email,
           photoURL: result.user.photoURL,
         };
 
-        // POST /users will create if not exists, or your backend should handle duplicates
         try {
           const res = await axiosPublic.post("/users", userInfo);
           console.log("DB save response:", res.data);
@@ -74,7 +70,7 @@ const Login = () => {
             "DB save error:",
             dbError.response?.data || dbError.message
           );
-          // Non-blocking toast to aid debugging
+
           toast.error(
             dbError.response?.data?.message || "Failed to save user to database"
           );
@@ -85,11 +81,10 @@ const Login = () => {
       }
     } catch (error) {
       console.error("Google login error:", error);
-      // Still allow login even if DB save fails (user might already exist)
+
       if (error.code?.startsWith("auth/")) {
         toast.error(error.message || "Google login failed");
       } else {
-        // DB error but Firebase auth succeeded - still navigate
         toast.success("Login with Google successful!");
         navigate(from, { replace: true });
       }

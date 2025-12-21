@@ -41,7 +41,7 @@ const AllScholarships = () => {
   const { scholarships = [], isPending, isError } = useScholarships();
 
   // derive filter option lists from returned scholarships
-  const { categories, degrees, countries } = useMemo(() => {
+  const { categories, degrees, countries, fundingTypes } = useMemo(() => {
     const s = scholarships || [];
     const categories = Array.from(
       new Set(s.map((x) => x.scholarshipCategory).filter(Boolean))
@@ -52,7 +52,14 @@ const AllScholarships = () => {
     const countries = Array.from(
       new Set(s.map((x) => x.universityCountry || x.location).filter(Boolean))
     ).sort();
-    return { categories, degrees, countries };
+
+    // funding types can be stored in different fields; prefer explicit 'fundingType' or 'funding', fallback to scholarshipCategory
+    const fundingCandidates = s
+      .map((x) => x.fundingType || x.funding || x.scholarshipCategory)
+      .filter(Boolean);
+    const fundingTypes = Array.from(new Set(fundingCandidates)).sort();
+
+    return { categories, degrees, countries, fundingTypes };
   }, [scholarships]);
 
   const clearFilters = () => {
@@ -95,9 +102,12 @@ const AllScholarships = () => {
       list = list.filter((s) => s.scholarshipCategory === category);
     }
 
-    // Funding type filter
+    // Funding type filter (try multiple possible fields)
     if (fundingType) {
-      list = list.filter((s) => s.scholarshipCategory === fundingType);
+      list = list.filter((s) => {
+        const ft = s.fundingType || s.funding || s.scholarshipCategory;
+        return ft === fundingType;
+      });
     }
 
     // Degree filter
@@ -269,8 +279,11 @@ const AllScholarships = () => {
               className="select select-bordered select-sm w-full h-10"
             >
               <option value="">All Types</option>
-              <option value="Full Ride">Full Ride</option>
-              <option value="Partial">Partial</option>
+              {fundingTypes.map((f) => (
+                <option key={f} value={f}>
+                  {f}
+                </option>
+              ))}
             </select>
           </div>
 

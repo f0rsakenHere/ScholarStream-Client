@@ -132,11 +132,13 @@ const ScholarshipDetails = () => {
 
           {/* Key Details Grid */}
           <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8">
-            {scholarship.universityRank && (
+            {(scholarship.universityWorldRank ||
+              scholarship.universityRank) && (
               <div className="stat bg-base-100 shadow">
                 <div className="stat-title text-sm">World Rank</div>
                 <div className="stat-value text-lg">
-                  {scholarship.universityRank}
+                  {scholarship.universityWorldRank ||
+                    scholarship.universityRank}
                 </div>
               </div>
             )}
@@ -160,6 +162,24 @@ const ScholarshipDetails = () => {
                     ? `${scholarship.universityCity}, `
                     : ""}
                   {scholarship.universityCountry}
+                </div>
+              </div>
+            )}
+
+            {scholarship.tuitionFees && (
+              <div className="stat bg-base-100 shadow">
+                <div className="stat-title text-sm">Tuition</div>
+                <div className="stat-value text-lg">
+                  {formatCurrency(scholarship.tuitionFees)}
+                </div>
+              </div>
+            )}
+
+            {scholarship.subjectCategory && (
+              <div className="stat bg-base-100 shadow">
+                <div className="stat-title text-sm">Subject</div>
+                <div className="stat-value text-lg">
+                  {scholarship.subjectCategory}
                 </div>
               </div>
             )}
@@ -368,22 +388,27 @@ const ScholarshipDetails = () => {
                     <div className="flex items-center gap-4">
                       <img
                         src={
+                          review.userImage ||
                           review.reviewerImage ||
-                          `https://ui-avatars.com/api/?name=${review.reviewerName}&background=6b21a8&color=fff`
+                          `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                            review.userName || review.reviewerName || "User"
+                          )}&background=6b21a8&color=fff`
                         }
-                        alt={review.reviewerName}
+                        alt={review.userName || review.reviewerName || "User"}
                         className="w-12 h-12 rounded-full object-cover"
                         onError={(e) => {
-                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${review.reviewerName}&background=6b21a8&color=fff`;
+                          e.currentTarget.src = `https://ui-avatars.com/api/?name=${encodeURIComponent(
+                            review.userName || review.reviewerName || "User"
+                          )}&background=6b21a8&color=fff`;
                         }}
                       />
                       <div>
                         <h4 className="font-semibold text-base-content">
-                          {review.reviewerName}
+                          {review.userName || review.reviewerName || "User"}
                         </h4>
                         <p className="text-sm text-base-content/60">
                           {new Date(
-                            review.createdAt || review.date
+                            review.reviewDate || review.createdAt || review.date
                           ).toLocaleDateString()}
                         </p>
                       </div>
@@ -391,24 +416,29 @@ const ScholarshipDetails = () => {
 
                     {/* Rating */}
                     <div className="flex gap-1">
-                      {[...Array(5)].map((_, i) => (
-                        <span
-                          key={i}
-                          className={
-                            i < review.rating
-                              ? "text-yellow-400 text-lg"
-                              : "text-base-300 text-lg"
-                          }
-                        >
-                          ★
-                        </span>
-                      ))}
+                      {(() => {
+                        const r = review.ratingPoint || review.rating || 0;
+                        return [...Array(5)].map((_, i) => (
+                          <span
+                            key={i}
+                            className={
+                              i < Math.round(r)
+                                ? "text-yellow-400 text-lg"
+                                : "text-base-300 text-lg"
+                            }
+                          >
+                            ★
+                          </span>
+                        ));
+                      })()}
                     </div>
                   </div>
 
                   {/* Review Comment */}
                   <p className="text-base-content/80">
-                    {review.reviewText || review.comment}
+                    {review.reviewComment ||
+                      review.reviewText ||
+                      review.comment}
                   </p>
                 </div>
               </div>

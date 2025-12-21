@@ -26,10 +26,9 @@ const useUserRole = () => {
           return "student";
         }
 
-        // Fetch all users and find the one with matching email
         const res = await axiosSecure.get(`/users`);
         console.log("useUserRole - API response:", res.data);
-        const users = res.data.users; // Response format: { total, users: [...] }
+        const users = res.data.users;
         const currentUser = users.find((u) => u.email === user.email);
         console.log("useUserRole - found user:", currentUser);
         console.log("useUserRole - role:", currentUser?.role);
@@ -37,15 +36,13 @@ const useUserRole = () => {
       } catch (error) {
         console.error("Error fetching user role:", error);
         console.error("Error response:", error.response?.data);
-        return "student"; // Default to student on error
+        return "student";
       }
     },
   });
 
-  // Combined loading state: auth loading OR query loading
   const isRoleLoading = authLoading || isQueryLoading;
 
-  // Only derive role booleans AFTER loading is complete
   const effectiveRole = isRoleLoading ? undefined : userRole || "student";
 
   const isAdmin = effectiveRole === "admin";

@@ -29,35 +29,30 @@ const Register = () => {
   const onSubmit = async (data) => {
     setIsLoading(true);
     try {
-      // 1. Create User in Firebase
       const result = await createUser(data.email, data.password);
       const loggedUser = result.user;
       console.log("Firebase User Created:", loggedUser);
 
-      // 2. Update Profile (Name & Photo)
       await updateUserProfile(data.name, data.photoURL);
       console.log("User profile updated");
 
-      // 3. Save User to Database (MongoDB)
       const userInfo = {
         name: data.name,
         email: data.email,
         photoURL: data.photoURL,
-        role: "student", // Default role assignment
+        role: "student",
         createdAt: new Date(),
       };
 
       const res = await axiosPublic.post("/users", userInfo);
       console.log("Database response:", res.data);
 
-      // Handle both new user (insertedId) and existing user cases
       if (res.data.insertedId || res.data.message || res.status === 200) {
         console.log("User saved to database");
         reset();
         toast.success("Registration successful! Welcome to ScholarStream!");
         navigate("/dashboard");
       } else {
-        // Still continue if Firebase user was created
         reset();
         toast.success("Account created! Welcome to ScholarStream!");
         navigate("/dashboard");
@@ -65,7 +60,6 @@ const Register = () => {
     } catch (error) {
       console.error("Registration error:", error);
 
-      // Firebase-specific error handling
       if (error.code === "auth/email-already-in-use") {
         toast.error(
           "Email already registered. Please log in or use a different email."

@@ -19,8 +19,6 @@ const DashboardLayout = () => {
   const { isAdmin, isModerator, isStudent, userRole, isRoleLoading } =
     useUserRole();
 
-  // CRITICAL FIX: Show a loader while checking the role
-  // If we don't do this, it defaults to "Student" instantly
   if (isRoleLoading) {
     return (
       <div className="flex justify-center items-center h-screen">
@@ -44,7 +42,6 @@ const DashboardLayout = () => {
         : "text-base-content/70 hover:bg-base-100 hover:text-base-content"
     }`;
 
-  // Get role label for dashboard header
   const getRoleLabel = () => {
     if (isAdmin) return "Admin Dashboard";
     if (isModerator) return "Moderator Dashboard";
@@ -196,9 +193,13 @@ const DashboardLayout = () => {
                 }}
               />
             </div>
-            <div>
-              <p className="text-sm font-bold">{user?.displayName || "User"}</p>
-              <p className="text-xs text-base-content/60">{user?.email}</p>
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-bold truncate">
+                {user?.displayName || "User"}
+              </p>
+              <p className="text-xs text-base-content/60 truncate">
+                {user?.email}
+              </p>
               <div className="mt-2">
                 <span className="badge badge-sm bg-purple-600 text-white capitalize">
                   {userRole}
@@ -216,13 +217,11 @@ const DashboardLayout = () => {
         </div>
       </aside>
 
-      {/* Main content area */}
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <header className="bg-base-100 shadow-sm p-4 flex justify-between items-center z-0">
           <h1 className="text-xl font-bold text-base-content">
             {getRoleLabel()}
           </h1>
-          {/* You can add a Theme Toggle or Notification Bell here */}
         </header>
 
         <main className="flex-1 overflow-y-auto p-8 bg-base-200/50">

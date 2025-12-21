@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../../hooks/useAuth";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
@@ -17,6 +17,7 @@ const MyApplications = () => {
   const [rating, setRating] = useState(5);
   const [comment, setComment] = useState("");
   const [editFormData, setEditFormData] = useState({});
+  const [scholarshipDetails, setScholarshipDetails] = useState({});
 
   const {
     data: applicationsData,
@@ -31,6 +32,34 @@ const MyApplications = () => {
     },
     enabled: !!user?.email,
   });
+
+  // Fetch scholarship details for each application
+  useEffect(() => {
+    const fetchScholarshipDetails = async () => {
+      if (applicationsData?.applications) {
+        const details = {};
+        const scholarshipIds = applicationsData.applications
+          .map((app) => app.scholarshipId)
+          .filter(Boolean);
+
+        for (const scholarshipId of scholarshipIds) {
+          try {
+            const res = await axiosSecure.get(`/scholarships/${scholarshipId}`);
+            details[scholarshipId] = res.data;
+          } catch (err) {
+            console.error(`Failed to fetch scholarship ${scholarshipId}:`, err);
+          }
+        }
+        setScholarshipDetails(details);
+      }
+    };
+    fetchScholarshipDetails();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [applicationsData]);
+
+  // Helper function to get scholarship info
+  const getScholarship = (scholarshipId) =>
+    scholarshipDetails[scholarshipId] || {};
 
   const handleDelete = async (applicationId) => {
     const result = await Swal.fire({
@@ -173,122 +202,140 @@ const MyApplications = () => {
               </tr>
             </thead>
             <tbody>
-              {applications.map((application) => (
-                <tr key={application._id}>
-                  <td className="font-semibold">
-                    {application.universityName}
-                  </td>
-                  <td>{application.universityAddress || "N/A"}</td>
-                  <td>{application.scholarshipCategory}</td>
-                  <td className="font-bold text-primary">
-                    ${application.applicationFees}
-                  </td>
-                  <td>
-                    {application.feedback ? (
-                      <span className="text-sm italic">
-                        {application.feedback}
-                      </span>
-                    ) : (
-                      <span className="text-base-content/40">No feedback</span>
-                    )}
-                  </td>
-                  <td>
-                    <div
-                      className={`badge ${
-                        application.applicationStatus === "pending"
-                          ? "badge-warning"
-                          : application.applicationStatus === "approved"
-                          ? "badge-success"
-                          : application.applicationStatus === "completed"
-                          ? "badge-info"
-                          : "badge-error"
-                      } badge-sm`}
-                    >
-                      {application.applicationStatus}
-                    </div>
-                  </td>
-                  <td>
-                    <div
-                      className={`badge ${
-                        application.paymentStatus === "paid"
-                          ? "badge-success"
-                          : "badge-error"
-                      } badge-sm`}
-                    >
-                      {application.paymentStatus}
-                    </div>
-                  </td>
-                  <td>
-                    <div className="flex flex-wrap gap-1">
-                      {/* Details Button - Always visible */}
-                      <button
-                        onClick={() => {
-                          setSelectedApplication(application);
-                          setShowDetailsModal(true);
-                        }}
-                        className="btn btn-info btn-xs text-white"
+              {applications.map((application) => {
+                const scholarship = getScholarship(application.scholarshipId);
+                return (
+                  <tr key={application._id}>
+                    <td className="font-semibold">
+                      {application.universityName}
+                    </td>
+                    <td>
+                      {scholarship.universityCity ||
+                      scholarship.universityCountry
+                        ? `${
+                            scholarship.universityCity
+                              ? `${scholarship.universityCity}, `
+                              : ""
+                          }${scholarship.universityCountry || ""}`
+                        : "N/A"}
+                    </td>
+                    <td>
+                      {scholarship.subjectCategory ||
+                        application.scholarshipCategory ||
+                        "N/A"}
+                    </td>
+                    <td className="font-bold text-primary">
+                      ${application.applicationFees}
+                    </td>
+                    <td>
+                      {application.feedback ? (
+                        <span className="text-sm italic">
+                          {application.feedback}
+                        </span>
+                      ) : (
+                        <span className="text-base-content/40">
+                          No feedback
+                        </span>
+                      )}
+                    </td>
+                    <td>
+                      <div
+                        className={`badge ${
+                          application.applicationStatus === "pending"
+                            ? "badge-warning"
+                            : application.applicationStatus === "approved"
+                            ? "badge-success"
+                            : application.applicationStatus === "completed"
+                            ? "badge-info"
+                            : "badge-error"
+                        } badge-sm`}
                       >
-                        Details
-                      </button>
-
-                      {/* Edit Button - Only if pending */}
-                      {application.applicationStatus === "pending" && (
+                        {application.applicationStatus}
+                      </div>
+                    </td>
+                    <td>
+                      <div
+                        className={`badge ${
+                          application.paymentStatus === "paid"
+                            ? "badge-success"
+                            : "badge-error"
+                        } badge-sm`}
+                      >
+                        {application.paymentStatus}
+                      </div>
+                    </td>
+                    <td>
+                      <div className="flex flex-wrap gap-1">
+                        {/* Details Button - Always visible */}
                         <button
                           onClick={() => {
                             setSelectedApplication(application);
-                            setEditFormData({
-                              applicantName: application.applicantName,
-                              degree: application.degree,
-                            });
-                            setShowEditModal(true);
+                            setShowDetailsModal(true);
                           }}
-                          className="btn btn-warning btn-xs"
+                          className="btn btn-info btn-xs text-white"
                         >
-                          Edit
+                          Details
                         </button>
-                      )}
 
-                      {/* Pay Button - Only if pending AND unpaid */}
-                      {application.applicationStatus === "pending" &&
-                        application.paymentStatus === "unpaid" && (
+                        {/* Edit Button - Only if pending */}
+                        {application.applicationStatus === "pending" && (
                           <button
-                            onClick={() =>
-                              navigate(
-                                `/payment?scholarshipId=${application.scholarshipId}`
-                              )
-                            }
-                            className="btn btn-success btn-xs text-white"
+                            onClick={() => {
+                              setSelectedApplication(application);
+                              setEditFormData({
+                                applicantName: application.applicantName,
+                                degree: application.degree,
+                              });
+                              setShowEditModal(true);
+                            }}
+                            className="btn btn-warning btn-xs"
                           >
-                            Pay
+                            Edit
                           </button>
                         )}
 
-                      {/* Delete Button - Only if pending */}
-                      {application.applicationStatus === "pending" && (
-                        <button
-                          onClick={() => handleDelete(application._id)}
-                          className="btn btn-error btn-xs text-white"
-                        >
-                          Delete
-                        </button>
-                      )}
+                        {/* Pay Button - Only if pending AND unpaid */}
+                        {application.applicationStatus === "pending" &&
+                          application.paymentStatus === "unpaid" && (
+                            <button
+                              onClick={() =>
+                                navigate(
+                                  `/payment?scholarshipId=${application.scholarshipId}`
+                                )
+                              }
+                              className="btn btn-success btn-xs text-white"
+                            >
+                              Pay
+                            </button>
+                          )}
 
-                      {/* Add Review Button - Only if completed */}
-                      {application.applicationStatus === "completed" && (
-                        <button
-                          onClick={() => {
-                            setSelectedApplication(application);
-                            setShowReviewModal(true);
-                          }}
-                          className="btn btn-primary btn-xs text-white"
-                        >
-                          Add Review
-                        </button>
-                      )}
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                        {/* Delete Button - Only if pending */}
+                        {application.applicationStatus === "pending" && (
+                          <button
+                            onClick={() => handleDelete(application._id)}
+                            className="btn btn-error btn-xs text-white"
+                          >
+                            Delete
+                          </button>
+                        )}
+
+                        {/* Add Review Button - Only if completed */}
+                        {application.applicationStatus === "completed" && (
+                          <button
+                            onClick={() => {
+                              setSelectedApplication(application);
+                              setShowReviewModal(true);
+                            }}
+                            className="btn btn-primary btn-xs text-white"
+                          >
+                            Add Review
+                          </button>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>

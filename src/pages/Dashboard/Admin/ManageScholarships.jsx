@@ -21,7 +21,6 @@ const ManageScholarships = () => {
     formState: { errors },
   } = useForm();
 
-  // Fetch all scholarships
   const {
     data: scholarships = [],
     isLoading,
@@ -35,7 +34,6 @@ const ManageScholarships = () => {
     },
   });
 
-  // Filter scholarships based on search term
   const filteredScholarships = scholarships.filter(
     (scholarship) =>
       scholarship.scholarshipName
@@ -46,7 +44,6 @@ const ManageScholarships = () => {
         .includes(searchTerm.toLowerCase())
   );
 
-  // Handle delete scholarship
   const handleDeleteScholarship = async (id) => {
     Swal.fire({
       title: "Are you sure?",
@@ -74,10 +71,9 @@ const ManageScholarships = () => {
     });
   };
 
-  // Handle edit scholarship
   const handleEditScholarship = (scholarship) => {
     setEditingScholarship(scholarship);
-    // Reset form with the scholarship data
+
     reset({
       scholarshipName: scholarship.scholarshipName,
       universityName: scholarship.universityName,
@@ -95,7 +91,6 @@ const ManageScholarships = () => {
     });
   };
 
-  // Handle update scholarship
   const handleUpdateScholarship = async (data) => {
     setIsUpdating(true);
     try {
@@ -138,7 +133,6 @@ const ManageScholarships = () => {
     }
   };
 
-  // Handle close modal
   const handleCloseModal = () => {
     setEditingScholarship(null);
     reset();
