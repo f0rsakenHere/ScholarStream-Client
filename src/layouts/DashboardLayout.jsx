@@ -125,12 +125,6 @@ const DashboardLayout = () => {
                   <FaUser /> Moderator Profile
                 </NavLink>
                 <NavLink
-                  to="/dashboard/manage-scholarships"
-                  className={navLinkClasses}
-                >
-                  <FaList /> Manage Scholarships
-                </NavLink>
-                <NavLink
                   to="/dashboard/manage-applications"
                   className={navLinkClasses}
                 >

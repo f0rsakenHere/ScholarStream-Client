@@ -23,6 +23,11 @@ const AllScholarships = () => {
   const [sort, setSort] = useState("");
   const [fundingType, setFundingType] = useState("");
 
+  // Scroll to top on page load
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, []);
+
   // Debounce search input for smoother typing
   useEffect(() => {
     const t = setTimeout(

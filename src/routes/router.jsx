@@ -65,7 +65,7 @@ const router = createBrowserRouter([
       { path: "register", element: <Register /> },
       { path: "forgot-password", element: <ForgotPassword /> },
       {
-        path: "payment-success/:tranId",
+        path: "payment-success",
         element: (
           <PrivateRoute>
             <PaymentSuccess />
