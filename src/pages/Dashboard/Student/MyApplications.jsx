@@ -62,10 +62,12 @@ const MyApplications = () => {
     try {
       await axiosSecure.post("/reviews", {
         scholarshipId: selectedApplication.scholarshipId,
-        rating,
-        comment,
-        reviewerName: user?.displayName,
-        reviewerEmail: user?.email,
+        universityName: selectedApplication.universityName,
+        userName: user?.displayName || "Anonymous",
+        userEmail: user?.email,
+        userImage: user?.photoURL || "",
+        ratingPoint: rating,
+        reviewComment: comment,
       });
 
       Swal.fire("Success!", "Review submitted successfully", "success");
