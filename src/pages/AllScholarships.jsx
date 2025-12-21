@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useSearchParams } from "react-router-dom";
 import useScholarships from "../hooks/useScholarships";
 
 const formatCurrency = (v) => {
@@ -12,8 +12,11 @@ const formatCurrency = (v) => {
 };
 
 const AllScholarships = () => {
-  const [searchInput, setSearchInput] = useState("");
-  const [debouncedSearch, setDebouncedSearch] = useState("");
+  const [searchParams] = useSearchParams();
+  const initialSearch = searchParams.get("search") || "";
+
+  const [searchInput, setSearchInput] = useState(initialSearch);
+  const [debouncedSearch, setDebouncedSearch] = useState(initialSearch);
   const [category, setCategory] = useState("");
   const [degree, setDegree] = useState("");
   const [country, setCountry] = useState("");
@@ -61,14 +64,25 @@ const AllScholarships = () => {
   const visibleScholarships = useMemo(() => {
     let list = scholarships || [];
 
-    // Search filter
-    if (debouncedSearch) {
-      list = list.filter(
-        (s) =>
-          (s.scholarshipName || "").toLowerCase().includes(debouncedSearch) ||
-          (s.universityName || "").toLowerCase().includes(debouncedSearch) ||
-          (s.degree || "").toLowerCase().includes(debouncedSearch)
-      );
+    // Search filter (matches multiple fields)
+    const q = (debouncedSearch || "").trim();
+    if (q) {
+      list = list.filter((s) => {
+        const haystack = [
+          s.scholarshipName,
+          s.universityName,
+          s.degree,
+          s.scholarshipCategory,
+          s.scholarshipDescription,
+          s.universityCity,
+          s.universityCountry,
+          s.location,
+        ]
+          .filter(Boolean)
+          .join(" ")
+          .toLowerCase();
+        return haystack.includes(q);
+      });
     }
 
     // Category filter
