@@ -1,4 +1,5 @@
 import { Outlet, NavLink } from "react-router-dom";
+import { useState } from "react";
 import { useAuth } from "../hooks/useAuth";
 import useUserRole from "../hooks/useUserRole";
 import {
@@ -12,12 +13,15 @@ import {
   FaFileAlt,
   FaStar,
   FaClipboardList,
+  FaBars,
+  FaTimes,
 } from "react-icons/fa";
 
 const DashboardLayout = () => {
   const { user, logOut } = useAuth();
   const { isAdmin, isModerator, isStudent, userRole, isRoleLoading } =
     useUserRole();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   if (isRoleLoading) {
     return (
@@ -50,8 +54,20 @@ const DashboardLayout = () => {
 
   return (
     <div className="min-h-screen flex bg-base-100 font-sans">
+      {/* Mobile overlay */}
+      {sidebarOpen && (
+        <div
+          className="fixed inset-0 bg-black/50 z-20 md:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-72 bg-white border-r border-base-200/30 shadow-sm flex flex-col z-10">
+      <aside
+        className={`fixed md:relative w-72 bg-white border-r border-base-200/30 shadow-sm flex flex-col z-30 transition-transform duration-300 h-screen md:h-auto ${
+          sidebarOpen ? "translate-x-0" : "-translate-x-full md:translate-x-0"
+        }`}
+      >
         <div className="px-6 py-5 border-b border-base-200/20">
           <div className="flex items-center gap-3">
             <div className="w-11 h-11 rounded-full flex items-center justify-center bg-gradient-to-b from-purple-200 to-purple-400 text-white font-bold">
@@ -219,12 +235,18 @@ const DashboardLayout = () => {
 
       <div className="flex-1 flex flex-col h-screen overflow-hidden">
         <header className="bg-base-100 shadow-sm p-4 flex justify-between items-center z-0">
-          <h1 className="text-xl font-bold text-base-content">
+          <button
+            onClick={() => setSidebarOpen(!sidebarOpen)}
+            className="btn btn-ghost btn-circle md:hidden"
+          >
+            {sidebarOpen ? <FaTimes size={20} /> : <FaBars size={20} />}
+          </button>
+          <h1 className="text-xl font-bold text-base-content flex-1 text-center md:text-left">
             {getRoleLabel()}
           </h1>
         </header>
 
-        <main className="flex-1 overflow-y-auto p-8 bg-base-200/50">
+        <main className="flex-1 overflow-y-auto p-4 md:p-8 bg-base-200/50">
           <Outlet />
         </main>
       </div>
