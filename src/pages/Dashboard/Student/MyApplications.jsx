@@ -10,6 +10,9 @@ const MyApplications = () => {
   const axiosSecure = useAxiosSecure();
   const navigate = useNavigate();
 
+  // Debug: log email to find the source of duplication
+  console.log("User email from auth:", user?.email);
+
   const [selectedApplication, setSelectedApplication] = useState(null);
   const [showDetailsModal, setShowDetailsModal] = useState(false);
   const [showReviewModal, setShowReviewModal] = useState(false);
@@ -18,6 +21,7 @@ const MyApplications = () => {
   const [comment, setComment] = useState("");
   const [editFormData, setEditFormData] = useState({});
   const [scholarshipDetails, setScholarshipDetails] = useState({});
+  const [userReviews, setUserReviews] = useState([]);
 
   const {
     data: applicationsData,
@@ -57,9 +61,35 @@ const MyApplications = () => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [applicationsData]);
 
+  // Fetch user reviews
+  useEffect(() => {
+    const fetchUserReviews = async () => {
+      try {
+        const res = await axiosSecure.get(
+          `/reviews/filter?userEmail=${user?.email}`
+        );
+        const reviews = Array.isArray(res.data)
+          ? res.data
+          : res.data?.reviews || [];
+        setUserReviews(reviews);
+      } catch (error) {
+        console.error("Failed to fetch reviews:", error);
+      }
+    };
+
+    if (user?.email) {
+      fetchUserReviews();
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user?.email]);
+
   // Helper function to get scholarship info
   const getScholarship = (scholarshipId) =>
     scholarshipDetails[scholarshipId] || {};
+
+  // Helper function to check if user has a review for a scholarship
+  const hasReviewForScholarship = (scholarshipId) =>
+    userReviews.some((review) => review.scholarshipId === scholarshipId);
 
   const handleDelete = async (applicationId) => {
     const result = await Swal.fire({
@@ -319,18 +349,34 @@ const MyApplications = () => {
                           </button>
                         )}
 
-                        {/* Add Review Button - Only if completed */}
-                        {application.applicationStatus === "completed" && (
-                          <button
-                            onClick={() => {
-                              setSelectedApplication(application);
-                              setShowReviewModal(true);
-                            }}
-                            className="btn btn-primary btn-xs text-white"
-                          >
-                            Add Review
-                          </button>
-                        )}
+                        {/* Add Review Button - Only if completed and no existing review */}
+                        {application.applicationStatus === "completed" &&
+                          !hasReviewForScholarship(
+                            application.scholarshipId
+                          ) && (
+                            <button
+                              onClick={() => {
+                                setSelectedApplication(application);
+                                setShowReviewModal(true);
+                              }}
+                              className="btn btn-primary btn-xs text-white"
+                            >
+                              Add Review
+                            </button>
+                          )}
+
+                        {/* Edit Review Button - Only if completed and review exists */}
+                        {application.applicationStatus === "completed" &&
+                          hasReviewForScholarship(
+                            application.scholarshipId
+                          ) && (
+                            <button
+                              onClick={() => navigate("/dashboard/my-reviews")}
+                              className="btn btn-secondary btn-xs text-white"
+                            >
+                              Edit Review
+                            </button>
+                          )}
                       </div>
                     </td>
                   </tr>

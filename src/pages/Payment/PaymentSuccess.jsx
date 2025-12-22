@@ -13,7 +13,6 @@ const PaymentSuccess = () => {
   }, []);
 
   useEffect(() => {
-    // Simulate verification
     const timer = setTimeout(() => {
       setIsLoading(false);
     }, 1500);

@@ -5,6 +5,7 @@ import DashboardLayout from "../layouts/DashboardLayout";
 import PrivateRoute from "./PrivateRoute";
 import AdminRoute from "./AdminRoute";
 import ModeratorRoute from "./ModeratorRoute";
+import StudentRoute from "./StudentRoute";
 
 // Public Pages
 import Home from "../pages/Home/Home";
@@ -94,10 +95,31 @@ const router = createBrowserRouter([
       // Default dashboard landing -> role-aware redirect
       { index: true, element: <DashboardIndex /> },
 
-      // Student routes (private)
-      { path: "user-profile", element: <StudentProfile /> },
-      { path: "my-applications", element: <MyApplications /> },
-      { path: "my-reviews", element: <MyReviews /> },
+      // Student routes (StudentRoute)
+      {
+        path: "user-profile",
+        element: (
+          <StudentRoute>
+            <StudentProfile />
+          </StudentRoute>
+        ),
+      },
+      {
+        path: "my-applications",
+        element: (
+          <StudentRoute>
+            <MyApplications />
+          </StudentRoute>
+        ),
+      },
+      {
+        path: "my-reviews",
+        element: (
+          <StudentRoute>
+            <MyReviews />
+          </StudentRoute>
+        ),
+      },
 
       // Moderator routes (ModeratorRoute)
       {

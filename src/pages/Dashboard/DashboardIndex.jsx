@@ -2,7 +2,7 @@ import { Navigate } from "react-router-dom";
 import useUserRole from "../../hooks/useUserRole";
 
 const DashboardIndex = () => {
-  const { isRoleLoading, isAdmin, isModerator, isStudent } = useUserRole();
+  const { isRoleLoading, isAdmin, isModerator } = useUserRole();
 
   if (isRoleLoading) {
     return (

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useAuth } from "../../../hooks/useAuth";
 import useAxiosSecure from "../../../hooks/useAxiosSecure";
@@ -12,6 +12,7 @@ const MyReviews = () => {
   const [showEditModal, setShowEditModal] = useState(false);
   const [editRating, setEditRating] = useState(5);
   const [editComment, setEditComment] = useState("");
+  const [scholarshipDetails, setScholarshipDetails] = useState({});
 
   const {
     data: reviewsData,
@@ -21,13 +22,70 @@ const MyReviews = () => {
   } = useQuery({
     queryKey: ["myReviews", user?.email],
     queryFn: async () => {
-      const res = await axiosSecure.get(
-        `/reviews/filter?userEmail=${user?.email}`
-      );
-      return res.data;
+      try {
+        console.log("Fetching reviews for email:", user?.email);
+        const res = await axiosSecure.get(
+          `/reviews/filter?userEmail=${user?.email}`
+        );
+        console.log("Reviews API response:", res.data);
+        console.log("Response structure:", {
+          total: res.data?.total,
+          averageRating: res.data?.averageRating,
+          reviewsLength: res.data?.reviews?.length,
+        });
+
+        const reviewsArray = Array.isArray(res.data)
+          ? res.data
+          : res.data?.reviews || [];
+        console.log(
+          "Individual review emails:",
+          reviewsArray.map((r) => r.userEmail)
+        );
+
+        return res.data;
+      } catch (err) {
+        console.error("Reviews fetch error:", err);
+        console.error("Error response:", err.response?.data);
+        throw err;
+      }
     },
     enabled: !!user?.email,
   });
+
+  // Extract reviews array from response
+  const reviews = Array.isArray(reviewsData)
+    ? reviewsData
+    : reviewsData?.reviews || [];
+
+  // Fetch scholarship details for each review
+  useEffect(() => {
+    const fetchScholarshipDetails = async () => {
+      if (!reviews || reviews.length === 0) return;
+
+      const details = {};
+      for (const review of reviews) {
+        if (review.scholarshipId && !scholarshipDetails[review.scholarshipId]) {
+          try {
+            const res = await axiosSecure.get(
+              `/scholarships/${review.scholarshipId}`
+            );
+            details[review.scholarshipId] = res.data;
+          } catch (error) {
+            console.error(
+              `Error fetching scholarship ${review.scholarshipId}:`,
+              error
+            );
+          }
+        }
+      }
+
+      if (Object.keys(details).length > 0) {
+        setScholarshipDetails((prev) => ({ ...prev, ...details }));
+      }
+    };
+
+    fetchScholarshipDetails();
+  }, [reviews.length, axiosSecure]);
 
   const handleEditClick = (review) => {
     setSelectedReview(review);
@@ -91,6 +149,7 @@ const MyReviews = () => {
   }
 
   if (error) {
+    console.error("Reviews error:", error);
     return (
       <div className="alert alert-error">
         <span>Error loading reviews: {error.message}</span>
@@ -98,7 +157,7 @@ const MyReviews = () => {
     );
   }
 
-  const reviews = reviewsData?.reviews || [];
+  console.log("Processed reviews:", reviews);
 
   return (
     <div className="p-6">
@@ -146,47 +205,54 @@ const MyReviews = () => {
               </tr>
             </thead>
             <tbody>
-              {reviews.map((review) => (
-                <tr key={review._id}>
-                  <td className="font-semibold">
-                    {review.scholarshipName || "N/A"}
-                  </td>
-                  <td>{review.universityName}</td>
-                  <td>
-                    <span className="text-sm italic line-clamp-2">
-                      {review.reviewComment}
-                    </span>
-                  </td>
-                  <td>
-                    {review.reviewDate
-                      ? new Date(review.reviewDate).toLocaleDateString()
-                      : new Date(review.createdAt).toLocaleDateString()}
-                  </td>
-                  <td>
-                    <div className="flex items-center gap-1">
-                      <span className="text-yellow-500">★</span>
-                      <span className="font-bold">{review.ratingPoint}</span>
-                      <span className="text-base-content/60">/5</span>
-                    </div>
-                  </td>
-                  <td>
-                    <div className="flex gap-1">
-                      <button
-                        onClick={() => handleEditClick(review)}
-                        className="btn btn-warning btn-xs"
-                      >
-                        Edit
-                      </button>
-                      <button
-                        onClick={() => handleDeleteReview(review._id)}
-                        className="btn btn-error btn-xs text-white"
-                      >
-                        Delete
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+              {reviews.map((review) => {
+                const scholarship = scholarshipDetails[review.scholarshipId];
+                return (
+                  <tr key={review._id}>
+                    <td className="font-semibold">
+                      {scholarship?.scholarshipName ||
+                        review.scholarshipName ||
+                        "Loading..."}
+                    </td>
+                    <td>
+                      {scholarship?.universityName || review.universityName}
+                    </td>
+                    <td>
+                      <span className="text-sm italic line-clamp-2">
+                        {review.reviewComment}
+                      </span>
+                    </td>
+                    <td>
+                      {review.reviewDate
+                        ? new Date(review.reviewDate).toLocaleDateString()
+                        : new Date(review.createdAt).toLocaleDateString()}
+                    </td>
+                    <td>
+                      <div className="flex items-center gap-1">
+                        <span className="text-yellow-500">★</span>
+                        <span className="font-bold">{review.ratingPoint}</span>
+                        <span className="text-base-content/60">/5</span>
+                      </div>
+                    </td>
+                    <td>
+                      <div className="flex gap-1">
+                        <button
+                          onClick={() => handleEditClick(review)}
+                          className="btn btn-warning btn-xs"
+                        >
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => handleDeleteReview(review._id)}
+                          className="btn btn-error btn-xs text-white"
+                        >
+                          Delete
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
             </tbody>
           </table>
         </div>
